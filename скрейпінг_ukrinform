@@ -1,107 +1,105 @@
+title: "Ukrinform"
+output: html_notebook
+---
+
+
 ```{r}
 install.packages('rvest')    
 install.packages('tidyverse')
 install.packages("progress")
+---
 ```
 
-```{r setup, include=FALSE}
+
+```{r}
 library(rvest)  
 library(tidyverse)
 library(progress)
 ```
-
 ```{r}
-url <- "https://tyzhden.ua/News/"
+url <- "https://www.ukrinform.ua/rubric-polytics/block-lastnews"
 content <- read_html(url)
 content
 ```
+
 ```{r}
-url_template <- "https://tyzhden.ua/News/?page=0"
+url_template <- "https://www.ukrinform.ua/rubric-polytics/block-lastnews?page="
 numbers <- str_c(url_template,c(1:5))
 npages <- 5
-
 ```
 
 ```{r}
 content %>%
-  html_nodes("div.content") %>%
+  html_nodes("article") %>%
   html_text()
+```
 
+```{r}
 titles <- content %>%
-  html_nodes('div.bf3.ap7.news_regular') %>%
+  html_nodes('h2') %>%
   html_text() %>%
   str_trim()
 titles
 
-times <- content %>%
-  html_nodes('td.news1_td2.bf4') %>%
-  html_text() %>%
-  str_trim()
-
-times
-
 dates <- content %>%
-  html_nodes('div.title.bf3.bold.acolor1.aback7') %>%
+  html_nodes('div.restDay') %>%
   html_text() %>%
   str_trim()
 
 dates
-
 ```
 
 ```{r}
-df <- data.frame(titles = titles, times = times, dates = dates)
+df <- data.frame(titles = titles, dates = dates)
 
 
-write.csv(df, "news.csv", row.names = FALSE)    
+write.csv(df, "ukrinform.csv", row.names = FALSE)
 ```
 
 ```{r}
-read.csv("news.csv")
+read.csv
+("ukrinform.csv")
 ```
 
 ```{r}
-npages <- 5    
+
+ npages <-  3
 
 pb <- progress_bar$new(
   format = "  downloading [:bar] :percent in :elapsed ",
   total = npages, clear = FALSE, width= 60)
 
 titles <- c()
-times <- c()
 dates <- c()
 links <- c()
 
-url_template <- "https://tyzhden.ua/News/?page="
+url_template <- "https://www.ukrinform.ua/rubric-polytics/block-lastnews?page="
+
 ```
 
 ```{r}
 for (page in 1:npages) {
+  
   url <- str_c(url_template,
-               page + 1)
+               page )
   
   content <- read_html(url)
   
   titles <- content %>%
-    html_nodes('div.bf3.ap7.news_regular') %>%
+    html_nodes('h2') %>%
     html_text() %>%
     str_trim() %>%
     c(titles, .)
   
-  times <- content %>%
-    html_nodes('td.news1_td2.bf4') %>%
-    html_text() %>%
-    str_trim() %>%
-    c(times, .)
   
   dates <- content %>%
-    html_nodes('div.title.bf3.bold.acolor1.aback7') %>%
+    html_nodes('div.restDay p') %>%
     html_text() %>%
     str_trim() %>%
     c(dates, .)
     
   links <- content %>%
-    html_nodes('a') %>%
+    html_nodes('h2 a') %>%
     html_attr("href") %>%
     c(links, .)
 
@@ -113,15 +111,13 @@ for (page in 1:npages) {
 
 
 ```{r}
-data.frame (titles = titles,
-           times = times,
-           dates = dates,
-           link = links) %>% 
-  write.csv("news.csv")
-  
-```
+data.frame(title = titles,
+           date = dates,
+           link = links) %>%
+  write.csv("ukrinform.csv",
+            row.names = FALSE) 
 
 ```{r}
-df <- read.csv("news.csv")
+df <- read.csv("ukrinform.csv")
 df
 ```
