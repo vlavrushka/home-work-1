@@ -63,7 +63,7 @@ read.csv
 
 ```{r}
 
- npages <-  3
+ npages <-  6
 
 pb <- progress_bar$new(
   format = "  downloading [:bar] :percent in :elapsed ",
