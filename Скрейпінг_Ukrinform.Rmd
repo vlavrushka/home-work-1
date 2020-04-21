@@ -91,23 +91,23 @@ for (page in 1:npages) {
   url <- str_c(url_template,
                page )
   
-  content <- read_html(url)
+  content <- read_html(url) %>%
+    html_node("section.restList")    # елемент, де всі потрібні дані
   
   titles <- content %>%
-    html_nodes('h2') %>%
+    html_nodes("article h2") %>%
     html_text() %>%
     str_trim() %>%
     c(titles, .)
   
-  
   dates <- content %>%
-    html_nodes('div.restDay p') %>%
-    html_text() %>%
+    html_nodes("article time") %>%
+    html_attr("datetime") %>%
     str_trim() %>%
     c(dates, .)
     
   links <- content %>%
-    html_nodes('h2 a') %>%
+    html_nodes("article h2 a") %>%
     html_attr("href") %>%
     c(links, .)
 
