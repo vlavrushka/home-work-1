@@ -65,7 +65,7 @@ air[,c("date","year","month", "day")]
 air <- air %>%
   group_by(day,month) %>%
   filter(n() == 2) %>%
-  ungroup
+  ungroup()
 air
   
 ```
